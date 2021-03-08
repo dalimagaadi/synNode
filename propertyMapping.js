@@ -1,4 +1,4 @@
-export const dossierModel = {
+export const dossierMapping = {
   dossiernummer: "Dossiernummer",
   debiteurnummer: [
     "Debiteurnummer",
@@ -20,7 +20,7 @@ export const dossierModel = {
   opdrachtgever: ["Opdrachtgever", "opdrachtgever"]
 };
 
-export const debiteurModel = {
+export const debiteurMapping = {
   debiteurnummer: [
     "Debiteurnummer",
     "debiteurnummer",

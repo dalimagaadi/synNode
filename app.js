@@ -4,16 +4,13 @@ const { csv } = csvpkg;
 const db = require("./models");
 //Properties & models
 import * as Properties from "./properties.js";
-import * as Models from "./propertyMapping.js";
+import * as Mapping from "./propertyMapping.js";
 const dossierPath = "Voorbeeld dossiers import.csv";
 const factuurPath = "Voorbeeld facturen import.csv";
 
-// const db = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "root",
-//   database: "syncasso"
-// });
+const { Dossier } = require("./models");
+db.sequelize.sync().then(() => {});
+
 let app = () => {
   const converter = csv({
     delimiter: ";",
@@ -22,26 +19,26 @@ let app = () => {
       factuurnummer: "omit"
     }
   });
-  db.sequelize.sync().then((req) => {
-    console.log("Gelukt");
-  });
   let dossierList = [];
   let debiteurList = [];
   converter.fromFile(dossierPath).then((source) => {
     for (let i = 0; i < source.length; i++) {
       let dossier,
         debiteur = {};
-      dossier = extractObject(Models.dossierModel, source[i]);
+      dossier = extractObject(Mapping.dossierMapping, source[i]);
       normalizer.run(dossier, Properties.dossierProperties);
       if (!checkDuplicate(dossier, dossierList, "dossiernummer"))
         dossierList.push(dossier);
-      debiteur = extractObject(Models.debiteurModel, source[i]);
+      debiteur = extractObject(Mapping.debiteurMapping, source[i]);
       normalizer.run(debiteur, Properties.debiteurProperties);
       if (!checkDuplicate(debiteur, debiteurList, "debiteurnummer"))
         debiteurList.push(debiteur);
     }
+    console.log(dossierList);
 
-    // console.log(dossierList);
+    for (let i = 0; i < dossierList.length; i++) {
+      Dossier.create(dossierList[i]);
+    }
   });
 
   function extractObject(model, source) {
