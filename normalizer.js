@@ -11,7 +11,13 @@ const normalizer = {
     }
     return obj;
   },
-
+  formatDate: function (obj) {
+    let initialDate = obj.geboortedatum.split(/\-/);
+    obj.geboortedatum = [initialDate[1], initialDate[0], initialDate[2]].join(
+      "-"
+    );
+    return obj;
+  },
   removeSpecialChars: function (obj, property) {
     if (typeof obj[property] !== "undefined") {
       obj[property] = obj[property].replace(/[^0-9a-z]/gi, "");

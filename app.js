@@ -8,7 +8,7 @@ import * as Mapping from "./propertyMapping.js";
 const dossierPath = "Voorbeeld dossiers import.csv";
 const factuurPath = "Voorbeeld facturen import.csv";
 
-const { Dossier } = require("./models");
+const { Dossier, Debiteur } = require("./models");
 db.sequelize.sync({ alter: true }).then(() => {});
 
 let app = () => {
@@ -21,32 +21,35 @@ let app = () => {
   });
   let dossierList = [];
   let debiteurList = [];
-  converter.fromFile(dossierPath).then((source) => {
-    for (let i = 0; i < source.length; i++) {
-      let dossier,
-        debiteur = {};
-      dossier = extractObject(Mapping.dossierMapping, source[i]);
-      normalizer.run(dossier, Properties.dossierProperties);
-      if (!checkDuplicate(dossier, dossierList, "dossiernummer"))
-        dossierList.push(dossier);
-      debiteur = extractObject(Mapping.debiteurMapping, source[i]);
-      normalizer.run(debiteur, Properties.debiteurProperties);
-      if (!checkDuplicate(debiteur, debiteurList, "debiteurnummer"))
-        debiteurList.push(debiteur);
-    }
-    // console.log(dossierList);
-
-    for (let i = 0; i < dossierList.length; i++) {
-      updateOrCreate(Dossier, dossierList[i]).then((created) => {
-        // console.log(created);
-      });
-    }
-  });
+  converter
+    .fromFile(dossierPath)
+    .then((source) => {
+      for (let i = 0; i < source.length; i++) {
+        let dossier,
+          debiteur = {};
+        dossier = extractObject(Mapping.dossierMapping, source[i]);
+        normalizer.run(dossier, Properties.dossierProperties);
+        if (!checkDuplicate(dossier, dossierList, "dossiernummer"))
+          dossierList.push(dossier);
+        debiteur = extractObject(Mapping.debiteurMapping, source[i]);
+        normalizer.run(debiteur, Properties.debiteurProperties);
+        if (!checkDuplicate(debiteur, debiteurList, "debiteurnummer"))
+          debiteurList.push(debiteur);
+      }
+    })
+    .then(() => {
+      for (let i = 0; i < dossierList.length; i++) {
+        updateOrCreate(Dossier, dossierList[i]);
+      }
+      for (let i = 0; i < debiteurList.length; i++) {
+        updateOrCreate(Debiteur, debiteurList[i]);
+      }
+    });
   async function updateOrCreate(model, newItem) {
     let pk = await getModelPk(model);
     // First try to find the record
     const foundItem = await model.findOne({
-      where: { dossiernummer: newItem[pk[0]] }
+      where: { [pk[0]]: newItem[pk[0]] }
     });
     if (!foundItem) {
       // Item not found, create a new one
@@ -55,7 +58,7 @@ let app = () => {
     }
     // Found an item, update it
     const item = await model.update(newItem, {
-      where: { dossiernummer: newItem[pk[0]] }
+      where: { [pk[0]]: newItem[pk[0]] }
     });
     return { item, created: false };
   }
@@ -94,4 +97,3 @@ let app = () => {
 module.exports = app;
 
 //Extractie automatiseren/herschrijven
-//Oplaan in SQL database
