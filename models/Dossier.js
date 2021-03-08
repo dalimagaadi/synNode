@@ -15,6 +15,34 @@ module.exports = (sequalize, DataTypes) => {
       validate: {
         notEmpty: true
       }
+    },
+    openstaandsaldo: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    hoofdsom: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    eisernummer: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    opdrachtgever: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
     }
   });
 

@@ -9,7 +9,7 @@ const dossierPath = "Voorbeeld dossiers import.csv";
 const factuurPath = "Voorbeeld facturen import.csv";
 
 const { Dossier } = require("./models");
-db.sequelize.sync().then(() => {});
+db.sequelize.sync({ alter: true }).then(() => {});
 
 let app = () => {
   const converter = csv({
@@ -37,10 +37,27 @@ let app = () => {
     console.log(dossierList);
 
     for (let i = 0; i < dossierList.length; i++) {
-      Dossier.create(dossierList[i]);
+      updateOrCreate(Dossier, "", dossierList[i]).then((created) => {
+        console.log(created);
+      });
     }
   });
-
+  async function updateOrCreate(model, where, newItem) {
+    // First try to find the record
+    const foundItem = await model.findOne({
+      where: { dossiernummer: newItem["dossiernummer"] }
+    });
+    if (!foundItem) {
+      // Item not found, create a new one
+      const item = await model.create(newItem);
+      return { item, created: true };
+    }
+    // Found an item, update it
+    const item = await model.update(newItem, {
+      where: { dossiernummer: newItem["dossiernummer"] }
+    });
+    return { item, created: false };
+  }
   function extractObject(model, source) {
     let obj = {};
     for (const [key, value] of Object.entries(model)) {
