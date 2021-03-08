@@ -4,9 +4,16 @@ const { csv } = csvpkg;
 
 //Properties & models
 import * as Properties from "./properties.js";
-import * as Models from "./models.js";
+import * as Models from "./propertyMapping.js";
 const dossierPath = "Voorbeeld dossiers import.csv";
 const factuurPath = "Voorbeeld facturen import.csv";
+
+// const db = mysql.createConnection({
+//   host: "localhost",
+//   user: "root",
+//   password: "root",
+//   database: "syncasso"
+// });
 
 const converter = csv({
   delimiter: ";",
