@@ -39,29 +39,34 @@ let app = () => {
     .fromFile(dossierPath)
     .then((source) => {
       for (let i = 0; i < source.length; i++) {
-        let dossier,
-          debiteur,
-          eiser,
-          opdrachtgever = {};
-        dossier = extractObject(Mapping.dossierMapping, source[i]);
-        normalizer.run(dossier, Properties.dossierProperties);
-        if (!checkDuplicate(dossier, dossierList, "dossiernummer"))
-          dossierList.push(dossier);
-
-        debiteur = extractObject(Mapping.debiteurMapping, source[i]);
-        normalizer.run(debiteur, Properties.debiteurProperties);
-        if (!checkDuplicate(debiteur, debiteurList, "debiteurnummer"))
-          debiteurList.push(debiteur);
-
-        opdrachtgever = extractObject(Mapping.opdrachtgeverMapping, source[i]);
-        normalizer.run(opdrachtgever, Properties.opdrachtgeverProperties);
-        if (!checkDuplicate(opdrachtgever, opdrachtgeverList, "opdrachtgever"))
-          opdrachtgeverList.push(opdrachtgever);
-
-        eiser = extractObject(Mapping.eiserMapping, source[i]);
-        normalizer.run(eiser, Properties.eiserProperties);
-        if (!checkDuplicate(eiser, eiserList, "eisernummer"))
-          eiserList.push(eiser);
+        extractAndNormalize(
+          Mapping.dossierMapping,
+          source[i],
+          Properties.dossierProperties,
+          dossierList,
+          "dossiernummer"
+        );
+        extractAndNormalize(
+          Mapping.debiteurMapping,
+          source[i],
+          Properties.debiteurProperties,
+          debiteurList,
+          "debiteurnummer"
+        );
+        extractAndNormalize(
+          Mapping.opdrachtgeverMapping,
+          source[i],
+          Properties.opdrachtgeverProperties,
+          opdrachtgeverList,
+          "opdrachtgever"
+        );
+        extractAndNormalize(
+          Mapping.eiserMapping,
+          source[i],
+          Properties.eiserProperties,
+          eiserList,
+          "eisernummer"
+        );
       }
     })
     .then(() => {
@@ -76,7 +81,6 @@ let app = () => {
           updateOrCreate(Eiser, eiserList[i]);
         }
         for (let i = 0; i < opdrachtgeverList.length; i++) {
-          console.log(opdrachtgeverList);
           updateOrCreate(Opdrachtgever, opdrachtgeverList[i]);
         }
       });
@@ -86,31 +90,34 @@ let app = () => {
     .fromFile(factuurPath)
     .then((source) => {
       for (let i = 0; i < source.length; i++) {
-        let factuur = {};
-        factuur = extractObject(Mapping.factuurMapping, source[i]);
-        normalizer.run(factuur, Properties.factuurProperties);
-        if (!checkDuplicate(factuur, factuurList, "factuurnummer"))
-          factuurList.push(factuur);
+        extractAndNormalize(
+          Mapping.factuurMapping,
+          source[i],
+          Properties.factuurProperties,
+          factuurList,
+          "factuurnummer"
+        );
       }
     })
     .then(() => {
-      for (let i = 0; i < factuurList.length; i++) {
-        updateOrCreate(Factuur, factuurList[i]);
-      }
+      db.sequelize.sync({ alter: true }).then(() => {
+        for (let i = 0; i < factuurList.length; i++) {
+          updateOrCreate(Factuur, factuurList[i]);
+        }
+      });
     });
 
   async function updateOrCreate(model, newItem) {
     let pk = await getModelPk(model);
-    // First try to find the record
+
     const foundItem = await model.findOne({
       where: { [pk[0]]: newItem[pk[0]] }
     });
     if (!foundItem) {
-      // Item not found, create a new one
       const item = await model.create(newItem);
       return { item, created: true };
     }
-    // Found an item, update it
+
     const item = await model.update(newItem, {
       where: { [pk[0]]: newItem[pk[0]] }
     });
@@ -125,6 +132,7 @@ let app = () => {
     });
   }
 
+  //Gebruik de gegeven object model om de attributen uit het CSVToJSON bestand te extracten
   function extractObject(model, source) {
     let obj = {};
     for (const [key, value] of Object.entries(model)) {
@@ -140,11 +148,24 @@ let app = () => {
     }
     return obj;
   }
+
+  //Controleer of er een object in de arraylist staat dat dezelfde PK heeft
   function checkDuplicate(object, list, pk) {
     if (list.some((item) => item[pk] === object[pk])) {
       return true;
     }
     return false;
+  }
+  function extractAndNormalize(
+    objectMapping,
+    source,
+    normalizationProperties,
+    objectList,
+    pk
+  ) {
+    let object = extractObject(objectMapping, source);
+    normalizer.run(object, normalizationProperties);
+    if (!checkDuplicate(object, objectList, pk)) objectList.push(object);
   }
 };
 

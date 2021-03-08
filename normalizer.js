@@ -24,7 +24,7 @@ const normalizer = {
     }
     return obj;
   },
-
+  //Functie waarmee het huisnummer en de bijvoeging ogpesplitst worden
   seperateHouseNumber: function (obj) {
     let bijvoegingRegex = new RegExp(/[a-zA-Z]{1,}/);
     let extractionRegex = new RegExp(/(\d*)\s{0,}([a-zA-Z]{1,})/);
@@ -37,7 +37,7 @@ const normalizer = {
     }
     return obj;
   },
-
+  //Functie waarmee de letters in een postcode worden geapitalised
   capitalizePostal: function (obj) {
     if (typeof obj["postcode"] !== "undefined") {
       obj["postcode"] = obj["postcode"].replace(
