@@ -2,7 +2,12 @@ export const dossierProperties = {
   dossiernummer: ["removeSpecialChars"]
 };
 
-export const factuurProperties = {};
+export const factuurProperties = {
+  factuurnummer: ["removeSpecialChars"],
+  datum: ["formatDate"],
+  bedrag: ["removeSpecialChars"],
+  dossiernummer: ["removeSpecialChars"]
+};
 
 export const debiteurProperties = {
   huisnummer: ["removeSpecialChars", "seperateHouseNumber"],

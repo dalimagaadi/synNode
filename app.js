@@ -2,27 +2,40 @@ import csvpkg from "csvtojson";
 import normalizer from "./normalizer.js";
 const { csv } = csvpkg;
 const db = require("./models");
+
 //Properties & models
-import * as Properties from "./properties.js";
+import * as Properties from "./normalizerProperties.js";
 import * as Mapping from "./propertyMapping.js";
+const {
+  Dossier,
+  Debiteur,
+  Eiser,
+  Opdrachtgever,
+  Factuur
+} = require("./models");
+
+//CSV paths
 const dossierPath = "Voorbeeld dossiers import.csv";
 const factuurPath = "Voorbeeld facturen import.csv";
 
-const { Dossier, Debiteur, Eiser, Opdrachtgever } = require("./models");
-
 let app = () => {
-  const converter = csv({
+  const dossierConverter = csv({
     delimiter: ";",
-    trim: true,
-    colParser: {
-      factuurnummer: "omit"
-    }
+    trim: true
   });
+
+  const factuurConverter = csv({
+    delimiter: ";",
+    trim: true
+  });
+
   let dossierList = [];
   let eiserList = [];
   let opdrachtgeverList = [];
   let debiteurList = [];
-  converter
+  let factuurList = [];
+
+  dossierConverter
     .fromFile(dossierPath)
     .then((source) => {
       for (let i = 0; i < source.length; i++) {
@@ -68,6 +81,24 @@ let app = () => {
         }
       });
     });
+
+  factuurConverter
+    .fromFile(factuurPath)
+    .then((source) => {
+      for (let i = 0; i < source.length; i++) {
+        let factuur = {};
+        factuur = extractObject(Mapping.factuurMapping, source[i]);
+        normalizer.run(factuur, Properties.factuurProperties);
+        if (!checkDuplicate(factuur, factuurList, "factuurnummer"))
+          factuurList.push(factuur);
+      }
+    })
+    .then(() => {
+      for (let i = 0; i < factuurList.length; i++) {
+        updateOrCreate(Factuur, factuurList[i]);
+      }
+    });
+
   async function updateOrCreate(model, newItem) {
     let pk = await getModelPk(model);
     // First try to find the record

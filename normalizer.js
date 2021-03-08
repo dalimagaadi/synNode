@@ -11,8 +11,8 @@ const normalizer = {
     }
     return obj;
   },
-  formatDate: function (obj) {
-    let initialDate = obj.geboortedatum.split(/\-/);
+  formatDate: function (obj, property) {
+    let initialDate = obj[property].split(/\-/);
     obj.geboortedatum = [initialDate[1], initialDate[0], initialDate[2]].join(
       "-"
     );

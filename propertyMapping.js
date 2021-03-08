@@ -74,3 +74,38 @@ export const opdrachtgeverMapping = {
     "opdrachtgever_naam"
   ]
 };
+
+export const factuurMapping = {
+  factuurnummer: [
+    "factnr",
+    "factuurnummer",
+    "factuur_nummer",
+    "Factuur_nummer",
+    "Factuur_Nummer",
+    "Factuurnummer"
+  ],
+  datum: [
+    "factdatum",
+    "Datum",
+    "fact_datum",
+    "factuur_datum",
+    "factuurdatum",
+    "factuurDatum",
+    "Factuur_Datum"
+  ],
+  bedrag: [
+    "factbedrag",
+    "fact_bedrag",
+    "factuurbedrag",
+    "factuur_bedrag",
+    "Factuurbedrag",
+    "bedrag"
+  ],
+  dossiernummer: [
+    "dossiernr",
+    "dossier_nummer",
+    "dossiernummer",
+    "Dossiernummer",
+    "dossier"
+  ]
+};
