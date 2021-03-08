@@ -1,3 +1,4 @@
+// Hier in worden de mogelijk CSV column waardes gelinkt aan de bijbehorden properties van het object
 export const dossierMapping = {
   dossiernummer: "Dossiernummer",
   debiteurnummer: [

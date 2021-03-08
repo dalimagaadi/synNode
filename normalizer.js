@@ -1,3 +1,4 @@
+// De normalizer neemt een object en de bijbehorende normalizerProprty en voert de nodige functies uit om de properties te wijzigen
 const normalizer = {
   run: function (obj, properties) {
     for (const [key, value] of Object.entries(properties)) {

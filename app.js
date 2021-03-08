@@ -35,6 +35,7 @@ let app = () => {
   let debiteurList = [];
   let factuurList = [];
 
+  //Het inlezen van het dossier CSV
   dossierConverter
     .fromFile(dossierPath)
     .then((source) => {
@@ -107,6 +108,7 @@ let app = () => {
       });
     });
 
+  //Functie om te controleren of de DB een row bevat met het PK van de gegeven item, zo ja dan wordt deze geupdate en zo niet dan wordt deze aangemaakt
   async function updateOrCreate(model, newItem) {
     let pk = await getModelPk(model);
 
@@ -124,6 +126,7 @@ let app = () => {
     return { item, created: false };
   }
 
+  //Gebruik maken van het Sequelize model om de PK op te halen
   async function getModelPk(model) {
     return model.describe().then((description) => {
       return Object.keys(description).filter((field) => {
@@ -156,6 +159,7 @@ let app = () => {
     }
     return false;
   }
+  //Voer de extractie en normalisatie functies uit voor het ophalen van de data
   function extractAndNormalize(
     objectMapping,
     source,

@@ -1,3 +1,4 @@
+//Hierin wordt aangegeven welke normalizer functies aangeroepen moeten worden op elke object attribuut
 export const dossierProperties = {
   dossiernummer: ["removeSpecialChars"]
 };
