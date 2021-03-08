@@ -34,18 +34,19 @@ let app = () => {
       if (!checkDuplicate(debiteur, debiteurList, "debiteurnummer"))
         debiteurList.push(debiteur);
     }
-    console.log(dossierList);
+    // console.log(dossierList);
 
     for (let i = 0; i < dossierList.length; i++) {
-      updateOrCreate(Dossier, "", dossierList[i]).then((created) => {
-        console.log(created);
+      updateOrCreate(Dossier, dossierList[i]).then((created) => {
+        // console.log(created);
       });
     }
   });
-  async function updateOrCreate(model, where, newItem) {
+  async function updateOrCreate(model, newItem) {
+    let pk = await getModelPk(model);
     // First try to find the record
     const foundItem = await model.findOne({
-      where: { dossiernummer: newItem["dossiernummer"] }
+      where: { dossiernummer: newItem[pk[0]] }
     });
     if (!foundItem) {
       // Item not found, create a new one
@@ -54,10 +55,19 @@ let app = () => {
     }
     // Found an item, update it
     const item = await model.update(newItem, {
-      where: { dossiernummer: newItem["dossiernummer"] }
+      where: { dossiernummer: newItem[pk[0]] }
     });
     return { item, created: false };
   }
+
+  async function getModelPk(model) {
+    return model.describe().then((description) => {
+      return Object.keys(description).filter((field) => {
+        return description[field].primaryKey;
+      });
+    });
+  }
+
   function extractObject(model, source) {
     let obj = {};
     for (const [key, value] of Object.entries(model)) {
