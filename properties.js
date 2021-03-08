@@ -9,3 +9,10 @@ export const debiteurProperties = {
   postcode: ["removeSpecialChars", "capitalizePostal"],
   geboortedatum: ["formatDate"]
 };
+export const opdrachtgeverProperties = {
+  opdrachtgever: ["removeSpecialChars"]
+};
+
+export const eiserProperties = {
+  eisernummer: ["removeSpecialChars"]
+};

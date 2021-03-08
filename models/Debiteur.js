@@ -1,5 +1,5 @@
 module.exports = (sequalize, DataTypes) => {
-  const Dossier = sequalize.define("Debiteur", {
+  const Debiteur = sequalize.define("Debiteur", {
     debiteurnummer: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -44,5 +44,5 @@ module.exports = (sequalize, DataTypes) => {
     }
   });
 
-  return Dossier;
+  return Debiteur;
 };

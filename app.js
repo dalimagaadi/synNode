@@ -8,8 +8,7 @@ import * as Mapping from "./propertyMapping.js";
 const dossierPath = "Voorbeeld dossiers import.csv";
 const factuurPath = "Voorbeeld facturen import.csv";
 
-const { Dossier, Debiteur } = require("./models");
-db.sequelize.sync({ alter: true }).then(() => {});
+const { Dossier, Debiteur, Eiser, Opdrachtgever } = require("./models");
 
 let app = () => {
   const converter = csv({
@@ -20,30 +19,54 @@ let app = () => {
     }
   });
   let dossierList = [];
+  let eiserList = [];
+  let opdrachtgeverList = [];
   let debiteurList = [];
   converter
     .fromFile(dossierPath)
     .then((source) => {
       for (let i = 0; i < source.length; i++) {
         let dossier,
-          debiteur = {};
+          debiteur,
+          eiser,
+          opdrachtgever = {};
         dossier = extractObject(Mapping.dossierMapping, source[i]);
         normalizer.run(dossier, Properties.dossierProperties);
         if (!checkDuplicate(dossier, dossierList, "dossiernummer"))
           dossierList.push(dossier);
+
         debiteur = extractObject(Mapping.debiteurMapping, source[i]);
         normalizer.run(debiteur, Properties.debiteurProperties);
         if (!checkDuplicate(debiteur, debiteurList, "debiteurnummer"))
           debiteurList.push(debiteur);
+
+        opdrachtgever = extractObject(Mapping.opdrachtgeverMapping, source[i]);
+        normalizer.run(opdrachtgever, Properties.opdrachtgeverProperties);
+        if (!checkDuplicate(opdrachtgever, opdrachtgeverList, "opdrachtgever"))
+          opdrachtgeverList.push(opdrachtgever);
+
+        eiser = extractObject(Mapping.eiserMapping, source[i]);
+        normalizer.run(eiser, Properties.eiserProperties);
+        if (!checkDuplicate(eiser, eiserList, "eisernummer"))
+          eiserList.push(eiser);
       }
     })
     .then(() => {
-      for (let i = 0; i < dossierList.length; i++) {
-        updateOrCreate(Dossier, dossierList[i]);
-      }
-      for (let i = 0; i < debiteurList.length; i++) {
-        updateOrCreate(Debiteur, debiteurList[i]);
-      }
+      db.sequelize.sync({ alter: true }).then(() => {
+        for (let i = 0; i < dossierList.length; i++) {
+          updateOrCreate(Dossier, dossierList[i]);
+        }
+        for (let i = 0; i < debiteurList.length; i++) {
+          updateOrCreate(Debiteur, debiteurList[i]);
+        }
+        for (let i = 0; i < eiserList.length; i++) {
+          updateOrCreate(Eiser, eiserList[i]);
+        }
+        for (let i = 0; i < opdrachtgeverList.length; i++) {
+          console.log(opdrachtgeverList);
+          updateOrCreate(Opdrachtgever, opdrachtgeverList[i]);
+        }
+      });
     });
   async function updateOrCreate(model, newItem) {
     let pk = await getModelPk(model);

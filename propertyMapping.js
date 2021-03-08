@@ -60,3 +60,17 @@ export const debiteurMapping = {
     "woonplaats"
   ]
 };
+
+export const eiserMapping = {
+  eisernummer: ["Eisernummer", "eisernummer", "eiser_nummer", "Eiser_nummer"],
+  naam: ["Eisernaam", "eisernaam"]
+};
+export const opdrachtgeverMapping = {
+  opdrachtgever: ["Opdrachtgever", "opdrachtgever"],
+  naam: [
+    "Opdrachtgevernaam",
+    "opdrachtgevernaam",
+    "Opdrachtgever_naam",
+    "opdrachtgever_naam"
+  ]
+};
