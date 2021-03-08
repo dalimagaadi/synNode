@@ -11,11 +11,15 @@ const normalizer = {
     }
     return obj;
   },
+
   removeSpecialChars: function (obj, property) {
-    obj[property] = obj[property].replace(/[^0-9a-z]/gi, "");
+    if (typeof obj[property] !== "undefined") {
+      obj[property] = obj[property].replace(/[^0-9a-z]/gi, "");
+    }
     return obj;
   },
-  seperateNummer: function (obj) {
+
+  seperateHouseNumber: function (obj) {
     let bijvoegingRegex = new RegExp(/[a-zA-Z]{1,}/);
     let extractionRegex = new RegExp(/(\d*)\s{0,}([a-zA-Z]{1,})/);
 
@@ -27,13 +31,17 @@ const normalizer = {
     }
     return obj;
   },
+
   capitalizePostal: function (obj) {
-    obj["postcode"] = obj["postcode"].replace(
-      new RegExp(/[a-zA-z]{2}$/),
-      function (chars) {
-        return chars.toUpperCase();
-      }
-    );
+    if (typeof obj["postcode"] !== "undefined") {
+      obj["postcode"] = obj["postcode"].replace(
+        new RegExp(/[a-zA-z]{2}$/),
+        function (chars) {
+          return chars.toUpperCase();
+        }
+      );
+    }
+    return obj;
   }
 };
 

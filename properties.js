@@ -1,7 +1,10 @@
 export const dossierProperties = {
-  huisnummer: ["removeSpecialChars", "seperateNummer"],
-  dossiernummer: ["removeSpecialChars"],
-  postcode: ["removeSpecialChars", "capitalizePostal"]
+  dossiernummer: ["removeSpecialChars"]
 };
 
 export const factuurProperties = {};
+
+export const debiteurProperties = {
+  huisnummer: ["removeSpecialChars", "seperateHouseNumber"],
+  postcode: ["removeSpecialChars", "capitalizePostal"]
+};
